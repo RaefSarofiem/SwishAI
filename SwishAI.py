@@ -25,7 +25,7 @@ def angle_between(a,b,c):
     a = numpy.array(a)
     b= numpy.array(b)
     c= numpy.array (c)
-
+    #arctan2 is used intead of arctan because arctan cannot handle x being 0
     radians= numpy.arctan2(c[1]-b[1], c[0]-b[0]) - numpy.arctan2(a[1]-b[1],a[0]-b[0])
     angle = numpy.abs(radians*180.0/numpy.pi)
 
@@ -81,13 +81,13 @@ with mpipe_pose.Pose(min_detection_confidence=detect_conf_level,min_tracking_con
             #right elbow is placeholder, put in its place all the midpoints
             #TODO replace 700,700 with dimensions of web cam
             cv2.putText(image,str(numpy.round(angle_shoulder)), tuple(numpy.multiply(right_elbow, [640,480]).astype(int)), 
-                                                cv2.FONT_HERSHEY_SIMPLEX,0.5, (255,255,255), 2, cv2.LINE_AA)
+                                                cv2.FONT_HERSHEY_SIMPLEX,1, (255,255,255), 2, cv2.LINE_AA)
         
             cv2.putText(image,str(numpy.round(angle_hip)), tuple(numpy.multiply(right_shoulder, [640,480]).astype(int)), 
-                                                cv2.FONT_HERSHEY_SIMPLEX,0.5, (255,255,255), 2, cv2.LINE_AA)
+                                                cv2.FONT_HERSHEY_SIMPLEX,1, (255,255,255), 2, cv2.LINE_AA)
         
             cv2.putText(image,str(numpy.round(angle_smooth)), tuple(numpy.multiply(left_hip, [640,480]).astype(int)), 
-                                                cv2.FONT_HERSHEY_SIMPLEX,0.5, (255,255,255), 2, cv2.LINE_AA)
+                                                cv2.FONT_HERSHEY_SIMPLEX,1, (255,255,255), 2, cv2.LINE_AA)
             
 
             print(nodes)

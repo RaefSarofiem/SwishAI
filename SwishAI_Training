@@ -37,7 +37,7 @@ def angle_between(a,b,c):
 
 ### video feed capture
 
-capture=cv2.VideoCapture(capture_device) #setting up video capture device (webcam)
+capture=cv2.Video #setting up video capture device (webcam)
 ##!TODO: check if this is the right webcam input (now and when you get the temp webcam from walmart)
 
 with mpipe_pose.Pose(min_detection_confidence=detect_conf_level,min_tracking_confidence=track_conf_level) as pose:
@@ -66,30 +66,24 @@ with mpipe_pose.Pose(min_detection_confidence=detect_conf_level,min_tracking_con
             right_elbow=[nodes[mpipe_pose.PoseLandmark.RIGHT_ELBOW.value].x,nodes[mpipe_pose.PoseLandmark.RIGHT_ELBOW.value].y]
             right_wrist=[nodes[mpipe_pose.PoseLandmark.RIGHT_WRIST.value].x,nodes[mpipe_pose.PoseLandmark.RIGHT_WRIST.value].y]
             right_hip=[nodes[mpipe_pose.PoseLandmark.RIGHT_HIP.value].x,nodes[mpipe_pose.PoseLandmark.RIGHT_HIP.value].y]
-            left_shoulder= [nodes[mpipe_pose.PoseLandmark.LEFT_SHOULDER.value].x,nodes[mpipe_pose.PoseLandmark.LEFT_SHOULDER.value].y]
-            left_hip=[nodes[mpipe_pose.PoseLandmark.LEFT_HIP.value].x,nodes[mpipe_pose.PoseLandmark.LEFT_HIP.value].y]
-            left_knee=[nodes[mpipe_pose.PoseLandmark.LEFT_KNEE.value].x,nodes[mpipe_pose.PoseLandmark.LEFT_KNEE.value].y]
-            ##ankle maybe
+            left_shoulder= [nodes[mpipe_pose.PoseLandmark.LEFT_SHOULDER.value].x,nodes[mpipe_pose.PoseLandmark.RIGHT_SHOULDER.value].y]
+            left_elbow=[nodes[mpipe_pose.PoseLandmark.LEFT_ELBOW.value].x,nodes[mpipe_pose.PoseLandmark.RIGHT_ELBOW.value].y]
+            left_wrist=[nodes[mpipe_pose.PoseLandmark.LEFT_WRIST.value].x,nodes[mpipe_pose.PoseLandmark.RIGHT_WRIST.value].y]
+            left_hip=[nodes[mpipe_pose.PoseLandmark.LEFT_HIP.value].x,nodes[mpipe_pose.PoseLandmark.RIGHT_HIP.value].y]
 
             #calculating angle of body parts
             angle_shoulder=angle_between(right_shoulder,right_elbow,right_wrist) 
             angle_hip=angle_between(right_hip,right_shoulder,right_elbow)
-            angle_smooth=angle_between(left_knee,left_hip,left_shoulder)
-
             #displaying angle on screen
 
             #right elbow is placeholder, put in its place all the midpoints
             #TODO replace 700,700 with dimensions of web cam
-            cv2.putText(image,str(numpy.round(angle_shoulder)), tuple(numpy.multiply(right_elbow, [640,480]).astype(int)), 
+            cv2.putText(image,str(angle_shoulder), tuple(numpy.multiply(right_elbow, [640,480]).astype(int)), 
                                                 cv2.FONT_HERSHEY_SIMPLEX,0.5, (255,255,255), 2, cv2.LINE_AA)
         
-            cv2.putText(image,str(numpy.round(angle_hip)), tuple(numpy.multiply(right_shoulder, [640,480]).astype(int)), 
+            cv2.putText(image,str(angle_hip), tuple(numpy.multiply(right_shoulder, [640,480]).astype(int)), 
                                                 cv2.FONT_HERSHEY_SIMPLEX,0.5, (255,255,255), 2, cv2.LINE_AA)
         
-            cv2.putText(image,str(numpy.round(angle_smooth)), tuple(numpy.multiply(left_hip, [640,480]).astype(int)), 
-                                                cv2.FONT_HERSHEY_SIMPLEX,0.5, (255,255,255), 2, cv2.LINE_AA)
-            
-
             print(nodes)
         except:
             pass

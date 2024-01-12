@@ -17,6 +17,23 @@ detect_conf_level=0.5 # higher is more accurate, but also less likely to work (m
 track_conf_level=0.5
 capture_device=0
 
+### functions
+
+# calculates angle between joints for analyzing displacement
+def angle_between(a,b,c):
+    #in order of joints closest to your core to farthest (ex. hip, knee, foot)
+    a = numpy.array(a)
+    b= numpy.array(b)
+    c= numpy.array (c)
+
+    radians= numpy.arctan2(c[1]-b[1], c[0]-b[0]) - numpy.arctan2(a[1]-b[1],a[0]-b[0])
+    angle = numpy.abs(radians*100.0/numpy.pi)
+
+    if angle > 180.0:
+        angle= 360 - angle
+    
+    return angle
+
 
 ### video feed capture
 
@@ -34,14 +51,43 @@ with mpipe_pose.Pose(min_detection_confidence=detect_conf_level,min_tracking_con
         image= cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
         image.flags.writeable= False # makes it impossible to change color order. saves memory
 
-        results= pose.process(image) # feed to mediapipe
+        tracked= pose.process(image) # feed to mediapipe
 
         # switch back to BGR, cv2 prefers BGR when rendering
         image.flags.writeable= True # making color order changeable again
         image = cv2.cvtColor(image,cv2.COLOR_RGB2BGR)
 
+        #extracting landmarks/nodes for calculations
+        try:
+            nodes= tracked.pose_landmarks.landmark
+            
+            #finding coordinates of nodes
+            right_shoulder= [nodes[mpipe_pose.PoseLandmark.RIGHT_SHOULDER.value].x,nodes[mpipe_pose.PoseLandmark.RIGHT_SHOULDER.value].y]
+            right_elbow=[nodes[mpipe_pose.PoseLandmark.RIGHT_ELBOW.value].x,nodes[mpipe_pose.PoseLandmark.RIGHT_ELBOW.value].y]
+            right_wrist=[nodes[mpipe_pose.PoseLandmark.RIGHT_WRIST.value].x,nodes[mpipe_pose.PoseLandmark.RIGHT_WRIST.value].y]
+            right_hip=[nodes[mpipe_pose.PoseLandmark.RIGHT_HIP.value].x,nodes[mpipe_pose.PoseLandmark.RIGHT_HIP.value].y]
+            left_shoulder= [nodes[mpipe_pose.PoseLandmark.LEFT_SHOULDER.value].x,nodes[mpipe_pose.PoseLandmark.RIGHT_SHOULDER.value].y]
+            left_elbow=[nodes[mpipe_pose.PoseLandmark.LEFT_ELBOW.value].x,nodes[mpipe_pose.PoseLandmark.RIGHT_ELBOW.value].y]
+            left_wrist=[nodes[mpipe_pose.PoseLandmark.LEFT_WRIST.value].x,nodes[mpipe_pose.PoseLandmark.RIGHT_WRIST.value].y]
+            left_hip=[nodes[mpipe_pose.PoseLandmark.LEFT_HIP.value].x,nodes[mpipe_pose.PoseLandmark.RIGHT_HIP.value].y]
+            #!TODO: check if this "PoseLandmark" is the correct variable
+            #calculating angle of body parts
+            angle=angle_between(right_shoulder,right_elbow,right_wrist) #TODO: fill this
+            
+            #displaying angle on screen
+
+            #right elbow is placeholder, put in its place all the midpoints
+            #TODO replace 700,700 with dimensions of web cam
+            cv2.putText(image,str(angle), tuple(numpy.multiply(right_elbow, [700,700]).astype(int)), 
+                                                cv2.FONT_HERSHEY_PLAIN,0.5, (255,255,255), 2, cv2.LINE_AA)
+        
+            print(nodes)
+        except:
+            pass
+    
+
         #rendering
-        mpipe_drawing.draw_landmarks(image,results.pose_landmarks, mpipe_pose.POSE_CONNECTIONS)
+        mpipe_drawing.draw_landmarks(image,tracked.pose_landmarks, mpipe_pose.POSE_CONNECTIONS)
 
 
         cv2.imshow('SwishAI Feed', image) # popup window

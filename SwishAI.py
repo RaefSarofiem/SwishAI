@@ -86,6 +86,10 @@ with mpipe_pose.Pose(min_detection_confidence=detect_conf_level_pose,min_trackin
 
                 
 
+
+                ###Acceleration
+                ###Use 
+
                 #calculating angle of body parts
                 angle_shoulder=angle_between(right_shoulder,right_elbow,right_wrist) 
                 angle_hip=angle_between(right_hip,right_shoulder,right_elbow)
@@ -130,7 +134,7 @@ with mpipe_pose.Pose(min_detection_confidence=detect_conf_level_pose,min_trackin
             cv2.imshow('SwishAI Feed', resized_image) # popup window
             if cv2.waitKey(10) & 0xFF == ord('q'): #if "q" (for quit) is pressed, stop the loop
                 break
-
+#
 # exited webcam capturing, stop capturing and close the window
 capture.release()
 cv2.destroyAllWindows()

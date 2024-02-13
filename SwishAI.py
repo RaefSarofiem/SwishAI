@@ -44,6 +44,18 @@ def angle_between(a,b,c):
     
     return angle
 
+###Acceleration
+###Use a=((2s/t^2)-(2u/t))
+#where a is acceleration, s is displacement , u initial velocity (0) , t is time
+###### when should we start tracking time?
+#can use angle markers for start of shot
+##OR when displacement is not 0 to when displacement is 0 (with a margin of error for human movement)
+#calculating angle of body parts
+#might need to run asynchronously
+def acceleration_of(part):
+    part= numpy.array(part) #turning list into array for efficiency
+    
+    
 
 ### video feed capture
 capture=cv2.VideoCapture(capture_device) ##seeting up video capture device (webcam)
@@ -70,11 +82,13 @@ with mpipe_pose.Pose(min_detection_confidence=detect_conf_level_pose,min_trackin
             #extracting landmarks/nodes for calculations
             try: ##in a try except statement to ignore any index errors that pop up when a body or hand are not found
                 #might need if statemnt around each one to check if they are detected first.
+
                 nodes_pose= tracked_pose.pose_landmarks.landmark
                 nodes_hand1=tracked_hands.multi_hand_landmarks[0].landmark
                 nodes_hand2=tracked_hands.multi_hand_landmarks[1].landmark
 
                 ##### finding coordinates of pose nodes
+               #TODO: coordinates for each finger joint
                 right_shoulder= [nodes_pose[mpipe_pose.PoseLandmark.RIGHT_SHOULDER.value].x,nodes_pose[mpipe_pose.PoseLandmark.RIGHT_SHOULDER.value].y]
                 right_elbow=[nodes_pose[mpipe_pose.PoseLandmark.RIGHT_ELBOW.value].x,nodes_pose[mpipe_pose.PoseLandmark.RIGHT_ELBOW.value].y]
                 right_wrist=[nodes_pose[mpipe_pose.PoseLandmark.RIGHT_WRIST.value].x,nodes_pose[mpipe_pose.PoseLandmark.RIGHT_WRIST.value].y]
@@ -87,13 +101,9 @@ with mpipe_pose.Pose(min_detection_confidence=detect_conf_level_pose,min_trackin
                 
 
 
-                ###Acceleration
-                ###Use 
-
-                #calculating angle of body parts
                 angle_shoulder=angle_between(right_shoulder,right_elbow,right_wrist) 
                 angle_hip=angle_between(right_hip,right_shoulder,right_elbow)
-                angle_smooth=angle_between(left_knee,left_hip,left_shoulder)
+                angle_smooth=angle_between(left_knee,left_hip,left_shoulder) #TODO: FIX
 
                 #displaying angle on screen
 
@@ -116,6 +126,7 @@ with mpipe_pose.Pose(min_detection_confidence=detect_conf_level_pose,min_trackin
 
             #rendering
             try:
+                #delete body palm , face renders
                 mpipe_drawing.draw_landmarks(image,tracked_pose.pose_landmarks, mpipe_pose.POSE_CONNECTIONS)
                 mpipe_drawing.draw_landmarks(image,tracked_hands.multi_hand_landmarks[0], mpipe_hands.HAND_CONNECTIONS)
                 mpipe_drawing.draw_landmarks(image,tracked_hands.multi_hand_landmarks[1], mpipe_hands.HAND_CONNECTIONS)
